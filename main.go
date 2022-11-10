@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -99,6 +100,27 @@ func FlatMatrix(records [][]string) string {
     return result[:len(result) - 1] // trim last ","
 }
 
+// SumMatrix returns the total sum of the elements in the matrix
+func SumMatrix(records [][]string) (int, error) {
+	var problem error
+    total := 0
+    for i := range records {
+        for _, n := range records[i] {
+			num, err := strconv.Atoi(n)
+			if err != nil {
+				problem = err
+				break
+			}
+            total += num
+        }
+    }
+
+	if problem != nil {
+		return 0, problem
+	}
+
+    return total, nil
+}
 
 
 
@@ -132,6 +154,21 @@ func main() {
 		}
 		
 		response := FlatMatrix(records)
+		fmt.Fprint(w, response, "\n")
+	})
+	http.HandleFunc("/sum", func(w http.ResponseWriter, r *http.Request) {		
+		records, err := extractMatrix(w, r)
+		if err != nil {
+			w.Write([]byte(fmt.Sprintf("Oops, something went wrong:\n%s", err.Error())))
+			return	
+		}
+		
+		response, err := SumMatrix(records)
+		if err != nil {
+			w.Write([]byte(fmt.Sprintf("Oops, something went wrong:\n%s", err.Error())))
+			return
+		}
+
 		fmt.Fprint(w, response, "\n")
 	})
 	http.ListenAndServe(":8080", nil)
