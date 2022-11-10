@@ -65,7 +65,7 @@ func StringifyMatrix(records [][]string) string {
     return strings.Join(s, "")
 }
 
-// InvertMatrix returns a string representation of the ingested matrix where the the order is changed from row to columns. Used by the "/invert" endpoint
+// InvertMatrix returns a string representation of the ingested matrix where the order is changed from row to columns. Used by the "/invert" endpoint
 func InvertMatrix(records [][]string) string {
     var inverted []string
     for i := range records {
@@ -80,6 +80,23 @@ func InvertMatrix(records [][]string) string {
         }
     }
     return strings.Join(inverted, "")
+}
+
+// FlatMatrix returns the ingested matrix as a 1 line string, with values separated by commas. Used by the "/flatten" endpoint
+func FlatMatrix(records [][]string) string {
+	matrixSize := len(records)
+    var s []string
+    for i := range records {
+        for ii, n := range records[i] {
+            s = append(s, fmt.Sprintf("%s", n))
+			s = append(s, fmt.Sprintf("%s", ","))
+			if i != (matrixSize - 1) && ii != (matrixSize - 1) {
+			}
+        }
+    }
+
+	result := strings.Join(s, "")
+    return result[:len(result) - 1] // trim last ","
 }
 
 
@@ -106,6 +123,16 @@ func main() {
 		
 		response := InvertMatrix(records)
 		fmt.Fprint(w, response)
+	})
+	http.HandleFunc("/flatten", func(w http.ResponseWriter, r *http.Request) {		
+		records, err := extractMatrix(w, r)
+		if err != nil {
+			w.Write([]byte(fmt.Sprintf("Oops, something went wrong:\n%s", err.Error())))
+			return	
+		}
+		
+		response := FlatMatrix(records)
+		fmt.Fprint(w, response, "\n")
 	})
 	http.ListenAndServe(":8080", nil)
 }
