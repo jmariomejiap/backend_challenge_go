@@ -1,3 +1,3 @@
-module github.com/jmariomejiap/interview/league/Backend_Challenge
+module backend_challenge
 
 go 1.17
