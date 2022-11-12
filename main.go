@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -14,6 +15,8 @@ import (
 ////////////////////
 
 func main() {
+	fmt.Println("I'm running on port 8080") 
+	
 	http.HandleFunc("/", HomeHandlerFunc)
 	http.HandleFunc("/echo", EchoHandlerFunc)
 	http.HandleFunc("/invert", InvertMatrixHandlerFunc)
